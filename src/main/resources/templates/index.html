@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Controle de Obra 100% - Java Senac</title>
+    <link rel="stylesheet" th:href="@{/bootstrap.css}">
+    <script th:src="@{/chart.js}"></script>
+</head>
+<body class="bg-light p-4">
+<div class="container bg-white p-4 rounded shadow-sm">
+    <!-- Barra Superior com botão de Logout -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h1>🏗️ Painel de Controle e Evolução da Obra</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-outline-danger btn-sm">🔒 Sair do Sistema</button>
+        </form>
+    </div>
+    <p class="text-muted">Gerencie metas, altere números planejados e acompanhe o progresso geral.</p>
+    <hr>
+
+    <!-- Indicadores Macro (Topo) -->
+    <div class="row my-4 align-items-center bg-light p-3 rounded border">
+        <div class="col-md-4 text-center border-end">
+            <h4 class="text-muted">Rendimento Total</h4>
+            <h1 class="text-success display-4 fw-bold" th:text="${progressoGeral} + '%'">0%</h1>
+            <div class="progress mt-2" style="height: 20px;">
+                <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar"
+                     th:style="'width: ' + ${progressoGeral} + '%'"></div>
+            </div>
+        </div>
+
+        <div class="col-md-4 text-center border-end">
+            <h5 class="fw-bold mb-2">📊 Proporção do Trabalho</h5>
+            <div style="max-height: 150px; display: flex; justify-content: center;">
+                <canvas id="graficoRoscaMacro"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-4 text-center">
+            <h5 class="fw-bold mb-1 text-danger">⚠️ Atividades Restantes</h5>
+            <h2 class="display-5 fw-bold text-danger" th:text="${totalAtividades - totalExecutadas}">0</h2>
+            <p class="text-muted small">Tarefas pendentes para atingir os 100%</p>
+        </div>
+    </div>
+    <hr>
+
+    <div class="row">
+        <!-- Gerenciamento Lateral -->
+        <div class="col-md-4 border-end pe-4">
+
+            <!-- Formulário 1: Lançar Atividades Feitas -->
+            <div class="card p-3 bg-light mb-3">
+                <h5 class="mb-2 text-success">⚙️ Lançar Atividades Feitas</h5>
+                <form action="/atualizar" method="post">
+                    <div class="mb-2">
+                        <select name="id" class="form-select form-select-sm" required>
+                            <option th:each="fase : ${fases}" th:value="${fase.id}"
+                                    th:text="${fase.nome} + ' (' + ${#numbers.formatDecimal(fase.porcentagem, 1, 1)} + '%)'"></option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label text-muted small mb-1">Quantidade Realizada:</label>
+                        <input type="number" name="executadas" class="form-control form-control-sm" min="0" value="0" required>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-sm w-100">Atualizar Progresso</button>
+                </form>
+            </div>
+
+            <!-- Formulário 2: Alterar Quantidade Planejada -->
+            <div class="card p-3 bg-light mb-3 border-info">
+                <h5 class="mb-2 text-info">✏️ Alterar Total Planejado</h5>
+                <form action="/editar-valores" method="post">
+                    <div class="mb-2">
+                        <select name="id" class="form-select form-select-sm" required>
+                            <option th:each="fase : ${fases}" th:value="${fase.id}" th:text="${fase.nome}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label text-muted small mb-1">Nova Meta Total de Tarefas:</label>
+                        <input type="number" name="totais" class="form-control form-control-sm" min="1" placeholder="Ex: Nova meta total" required>
+                    </div>
+                    <button type="submit" class="btn btn-info btn-sm w-100 text-white">Atualizar Meta de Tarefas</button>
+                </form>
+            </div>
+
+            <!-- Formulário 3: Mudar Nome do Trabalho -->
+            <div class="card p-3 bg-light mb-3">
+                <h5 class="mb-2 text-warning">✏️ Mudar Nome da Etapa</h5>
+                <form action="/editar-nome" method="post">
+                    <div class="mb-2">
+                        <select name="id" class="form-select form-select-sm" required>
+                            <option th:each="fase : ${fases}" th:value="${fase.id}" th:text="${fase.nome}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <input type="text" name="novoNome" class="form-control form-control-sm" placeholder="Novo nome da etapa" required>
+                    </div>
+                    <button type="submit" class="btn btn-warning btn-sm w-100">Salvar Novo Nome</button>
+                </form>
+            </div>
+
+            <!-- Formulário 4: Adicionar Nova Etapa -->
+            <div class="card p-3 bg-light mb-3">
+                <h5 class="mb-2 text-primary">➕ Adicionar Nova Etapa</h5>
+                <form action="/adicionar" method="post">
+                    <div class="mb-2">
+                        <input type="text" name="nome" class="form-control form-control-sm" placeholder="Nome da nova etapa" required>
+                    </div>
+                    <div class="mb-2">
+                        <input type="number" name="totais" class="form-control form-control-sm" min="1" value="10" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm w-100">Adicionar à Obra</button>
+                </form>
+            </div>
+
+            <!-- Formulário 5: Excluir Trabalho Existente -->
+            <div class="card p-3 bg-light border-danger">
+                <h5 class="mb-2 text-danger">🗑️ Excluir Etapa da Obra</h5>
+                <form action="/deletar" method="post" onsubmit="return confirm('Tem certeza de que deseja remover esta etapa permanentemente?');">
+                    <div class="mb-2">
+                        <select name="id" class="form-select form-select-sm border-danger" required>
+                            <option th:each="fase : ${fases}" th:value="${fase.id}" th:text="${fase.nome}"></option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-danger btn-sm w-100">Remover Permanentemente</button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- Exibição do Gráfico e Tabela Detalhada -->
+        <div class="col-md-8 ps-4">
+            <h4 class="mb-3">📊 Gráfico de Acompanhamento por Etapas</h4>
+            <canvas id="graficoObra" style="max-height: 320px;" class="mb-4"></canvas>
+
+            <h4 class="mb-3">📋 Resumo de Porcentagem por Item</h4>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle border">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Nome da Etapa</th>
+                        <th class="text-center">Total</th>
+                        <th class="text-center">Executadas</th>
+                        <th class="text-center">Restantes</th>
+                        <th class="text-center">Progresso Individual</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="fase : ${fases}">
+                        <td th:text="${fase.nome}" class="fw-semibold"></td>
+                        <td th:text="${fase.atividadesTotais}" class="text-center text-muted fw-bold"></td>
+                        <td th:text="${fase.atividadesExecutadas}" class="text-center text-success"></td>
+                        <td th:text="${fase.restante}" class="text-center text-danger"></td>
+                        <td class="text-center">
+                            <span class="badge bg-success" th:text="${#numbers.formatDecimal(fase.porcentagem, 1, 1)} + '%'">0%</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var totalExecutadas = /*[[${totalExecutadas}]]*/ 0;
+    var totalAtividades = /*[[${totalAtividades}]]*/ 0;
+    var totalRestantes = totalAtividades - totalExecutadas;
+    if(totalRestantes < 0) totalRestantes = 0;
+
+    var ctxMacro = document.getElementById('graficoRoscaMacro').getContext('2d');
+    new Chart(ctxMacro, {
+        type: 'doughnut',
+        data: {
+            labels: ['Executadas', 'Restantes'],
+            datasets: [{
+                data: [totalExecutadas, totalRestantes],
+                backgroundColor: ['#198754', '#dc3545'],
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+
+    var listaFases = /*[[${fases}]]*/ [];
+    var labelsBarras = [];
+    var dadosTotais = [];
+    var dadosExecutadas = [];
+
+    listaFases.forEach(function(fase) {
+        labelsBarras.push(fase.nome);
+        dadosTotais.push(fase.atividadesTotais);
+        dadosExecutadas.push(fase.atividadesExecutadas);
+    });
+
+    var ctxObra = document.getElementById('graficoObra').getContext('2d');
+    new Chart(ctxObra, {
+        type: 'bar',
+        data: {
+            datasets: [
+                { label: 'Meta Total', data: dadosTotais, backgroundColor: '#0dcaf0' },
+                { label: 'Realizado', data: dadosExecutadas, backgroundColor: '#198754' }
+            ]
+        },
+        options: { scales: { y: { beginAtZero: true } } }
+    });
+</script>
+</body>
+</html>
