@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html xmlns:th="http://thymeleaf.org" lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -55,8 +55,32 @@
         <!-- Gerenciamento Lateral -->
         <div class="col-md-4 border-end pe-4">
 
+            <!-- Formulário 4: Adicionar Nova Etapa -->
+            <div class="card p-3 bg-light mb-3 border-primary shadow-sm">
+                <h5 class="mb-2 text-primary">➕ Adicionar Nova Etapa</h5>
+                <form action="/adicionar" method="post">
+                    <div class="mb-2">
+                        <label class="form-label text-muted small mb-1">Nome da Obra/Empreendimento:</label>
+                        <input type="text" name="nomeObra"
+                               th:value="${nomeObra != 'Minha Obra Sem Nome' ? nomeObra : ''}"
+                               class="form-control form-control-sm" placeholder="Ex: Edifício Bella Vista" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label text-muted small mb-1">Nome da Nova Etapa:</label>
+                        <input type="text" name="nome" class="form-control form-control-sm" placeholder="Ex: Fundação"
+                               required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label text-muted small mb-1">Quantidade de Metas/Tarefas:</label>
+                        <input type="number" name="totais" class="form-control form-control-sm" min="1" value="10"
+                               required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm w-100">Adicionar à Obra</button>
+                </form>
+            </div>
+
             <!-- Formulário 1: Lançar Atividades Feitas -->
-            <div class="card p-3 bg-light mb-3">
+            <div class="card p-3 bg-light mb-3" th:if="${!fases.isEmpty()}">
                 <h5 class="mb-2 text-success">⚙️ Lançar Atividades Feitas</h5>
                 <form action="/atualizar" method="post">
                     <div class="mb-2">
@@ -67,14 +91,15 @@
                     </div>
                     <div class="mb-2">
                         <label class="form-label text-muted small mb-1">Quantidade Realizada:</label>
-                        <input type="number" name="executadas" class="form-control form-control-sm" min="0" value="0" required>
+                        <input type="number" name="executadas" class="form-control form-control-sm" min="0" value="0"
+                               required>
                     </div>
                     <button type="submit" class="btn btn-success btn-sm w-100">Atualizar Progresso</button>
                 </form>
             </div>
 
             <!-- Formulário 2: Alterar Quantidade Planejada -->
-            <div class="card p-3 bg-light mb-3 border-info">
+            <div class="card p-3 bg-light mb-3 border-info" th:if="${!fases.isEmpty()}">
                 <h5 class="mb-2 text-info">✏️ Alterar Total Planejado</h5>
                 <form action="/editar-valores" method="post">
                     <div class="mb-2">
@@ -84,14 +109,16 @@
                     </div>
                     <div class="mb-2">
                         <label class="form-label text-muted small mb-1">Nova Meta Total de Tarefas:</label>
-                        <input type="number" name="totais" class="form-control form-control-sm" min="1" placeholder="Ex: Nova meta total" required>
+                        <input type="number" name="totais" class="form-control form-control-sm" min="1"
+                               placeholder="Ex: Nova meta total" required>
                     </div>
-                    <button type="submit" class="btn btn-info btn-sm w-100 text-white">Atualizar Meta de Tarefas</button>
+                    <button type="submit" class="btn btn-info btn-sm w-100 text-white">Atualizar Meta de Tarefas
+                    </button>
                 </form>
             </div>
 
             <!-- Formulário 3: Mudar Nome do Trabalho -->
-            <div class="card p-3 bg-light mb-3">
+            <div class="card p-3 bg-light mb-3" th:if="${!fases.isEmpty()}">
                 <h5 class="mb-2 text-warning">✏️ Mudar Nome da Etapa</h5>
                 <form action="/editar-nome" method="post">
                     <div class="mb-2">
@@ -100,33 +127,18 @@
                         </select>
                     </div>
                     <div class="mb-2">
-                        <input type="text" name="novoNome" class="form-control form-control-sm" placeholder="Novo nome da etapa" required>
+                        <input type="text" name="novoNome" class="form-control form-control-sm"
+                               placeholder="Novo nome da etapa" required>
                     </div>
                     <button type="submit" class="btn btn-warning btn-sm w-100">Salvar Novo Nome</button>
                 </form>
             </div>
 
-            <!-- Formulário 4: Adicionar Nova Etapa -->
-            <div class="card p-3 bg-light mb-3">
-                <h5 class="mb-2 text-primary">➕ Adicionar Nova Etapa</h5>
-                <form action="/adicionar" method="post">
-                    <div class="mb-2">
-                        <input type="text" name="nomeObra" class="form-control form-control-sm" placeholder="Nome da Obra/Empreendimento" required>
-                    </div>
-                    <div class="mb-2">
-                        <input type="text" name="nome" class="form-control form-control-sm" placeholder="Nome da nova etapa" required>
-                    </div>
-                    <div class="mb-2">
-                        <input type="number" name="totais" class="form-control form-control-sm" min="1" value="10" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-sm w-100">Adicionar à Obra</button>
-                </form>
-            </div>
-
             <!-- Formulário 5: Excluir Trabalho Existente -->
-            <div class="card p-3 bg-light border-danger">
+            <div class="card p-3 bg-light border-danger" th:if="${!fases.isEmpty()}">
                 <h5 class="mb-2 text-danger">🗑️ Excluir Etapa da Obra</h5>
-                <form action="/deletar" method="post" onsubmit="return confirm('Tem certeza de que deseja remover esta etapa permanentemente?');">
+                <form action="/deletar" method="post"
+                      onsubmit="return confirm('Tem certeza de que deseja remover esta etapa permanentemente?');">
                     <div class="mb-2">
                         <select name="id" class="form-select form-select-sm border-danger" required>
                             <option th:each="fase : ${fases}" th:value="${fase.id}" th:text="${fase.nome}"></option>
@@ -135,83 +147,87 @@
                     <button type="submit" class="btn btn-danger btn-sm w-100">Remover Permanentemente</button>
                 </form>
             </div>
-
         </div>
 
         <!-- Exibição do Gráfico e Tabela Detalhada -->
         <div class="col-md-8 ps-4">
-            <h4 class="mb-3">📊 Gráfico de Acompanhamento por Etapas</h4>
-            <canvas id="graficoObra" style="max-height: 320px;" class="mb-4"></canvas>
-
-            <h4 class="mb-3">📋 Resumo de Porcentagem por Item</h4>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle border">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>Nome da Etapa</th>
-                        <th class="text-center">Total</th>
-                        <th class="text-center">Executadas</th>
-                        <th class="text-center">Restantes</th>
-                        <th class="text-center">Progresso Individual</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="fase : ${fases}">
-                        <td th:text="${fase.nome}" class="fw-semibold"></td>
-                        <td th:text="${fase.atividadesTotais}" class="text-center text-muted fw-bold"></td>
-                        <td th:text="${fase.atividadesExecutadas}" class="text-center text-success"></td>
-                        <td th:text="${fase.restante}" class="text-center text-danger"></td>
-                        <td class="text-center">
-                            <span class="badge bg-success" th:text="${#numbers.formatDecimal(fase.porcentagem, 1, 1)} + '%'">0%</span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div th:if="${fases.isEmpty()}" class="alert alert-info text-center fw-bold">
+                📭 Nenhuma etapa cadastrada para a sua obra ainda. Utilize o formulário ao lado para adicionar a primeira
+                etapa!
             </div>
-        </div>
-    </div>
-</div>
 
-<script th:inline="javascript">
-    var totalExecutadas = /*[[${totalExecutadas}]]*/ 0;
-    var totalAtividades = /*[[${totalAtividades}]]*/ 0;
-    var totalRestantes = totalAtividades - totalExecutadas;
-    if(totalRestantes < 0) totalRestantes = 0;
+            <div th:if="${!fases.isEmpty()}">
+                <h4 class="mb-3">📊 Gráfico de Acompanhamento por Etapas</h4>
+                <canvas id="graficoObra" style="max-height: 320px;" class="mb-4"></canvas>
 
-    var ctxMacro = document.getElementById('graficoRoscaMacro').getContext('2d');
-    new Chart(ctxMacro, {
-        type: 'doughnut',
-        data: {
+                <h4 class="mb-3">📋 Resumo de Porcentagem por Item</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle border">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>Nome da Etapa</th>
+                            <th class="text-center">Total</th>
+                            <th class="text-center">Executadas</th>
+                            <th class="text-center">Restantes</th>
+                            <th class="text-center">Progresso Individual</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="fase : ${fases}">
+                            <td th:text="${fase.nome}" class="fw-semibold"></td>
+                            <td th:text="${fase.atividadesTotais}" class="text-center text-muted fw-bold"></td>
+                            <td th:text="${fase.atividadesExecutadas}" class="text-center text-success"></td>
+                            <td th:text="${fase.restante}" class="text-center text-danger"></td>
+                            <td class="text-center">
+                                <span class="badge bg-success"
+                                      th:text="${#numbers.formatDecimal(fase.porcentagem, 1, 1)} + '%'">0%</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            Use o código com cuidado.
+            //<![CDATA[
+            var totalExecutadas = parseInt(document.getElementById('hdnTotalExecutadas').value) || 0;
+            var totalAtividades = parseInt(document.getElementById('hdnTotalAtividades').value) || 0;
+            var totalRestantes = totalAtividades - totalExecutadas;
+            if (totalRestantes < 0) totalRestantes = 0;
+            var ctxMacro = document.getElementById('graficoRoscaMacro').getContext('2d');
+            new Chart(ctxMacro, {
+            type: 'doughnut',
+            data: {
             labels: ['Executadas', 'Restantes'],
             datasets: [{
-                data: [totalExecutadas, totalRestantes],
-                backgroundColor: ['#198754', '#dc3545'],
-                borderWidth: 1
+            data: [totalExecutadas, totalRestantes],
+            backgroundColor: ['#198754', '#dc3545'],
+            borderWidth: 1
             }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } } }
-    });
-
-    var listaFases = /*[[${fases}]]*/ [];
-    var labelsBarras = [];
-    var dadosTotais = [];
-    var dadosExecutadas = [];
-
-    listaFases.forEach(function(fase) {
-
-        labelsBarras.push(fase.nome);
-        dadosTotais.push(fase.atividadesTotais);
-        dadosExecutadas.push(fase.atividadesExecutadas);
-    });
-    var ctxObra = document.getElementById('graficoObra').getContext('2d');
-    new Chart(ctxObra, {
-        type: 'bar',
-        data: {
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+            var labelsBarras = [];
+            var dadosTotais = [];
+            var dadosExecutadas = [];
+            var linhasTabela = document.querySelectorAll("table tbody tr");
+            linhasTabela.forEach(function(linha) {
+            var colunas = linha.querySelectorAll("td");
+            if (colunas.length >= 3) {
+            labelsBarras.push(colunas[0].textContent.trim());
+            dadosTotais.push(parseInt(colunas[1].textContent.trim()) || 0);
+            dadosExecutadas.push(parseInt(colunas[2].textContent.trim()) || 0);
+            }
+            });
+            var ctxObra = document.getElementById('graficoObra').getContext('2d');
+            new Chart(ctxObra, {
+            type: 'bar',
+            data: {
             labels: labelsBarras,
             datasets: [
-                { label: 'Meta Total', data: dadosTotais, backgroundColor: '#0dcaf0' },
-                { label: 'Realizado', data: dadosExecutadas, backgroundColor: '#198754' }
+            { label: 'Meta Total', data: dadosTotais, backgroundColor: '#0dcaf0' },
+            { label: 'Realizado', data: dadosExecutadas, backgroundColor: '#198754' }
             ]
-        },
-        options: { scales: { y: { beginAtZero: true } } }
-    });
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+            });
+            //]]>
