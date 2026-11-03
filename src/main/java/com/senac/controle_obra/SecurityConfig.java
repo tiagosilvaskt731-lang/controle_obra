@@ -17,19 +17,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // DESATIVA A VALIDAÇÃO DO CSRF PARA LIBERAR OS FORMULÁRIOS POST
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .defaultSuccessUrl("/", true) // Força ir para a rota limpa inicial após o login
+                        .defaultSuccessUrl("/", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
-                        .invalidateHttpSession(true) // DESTRÓI a sessão antiga na memória do servidor
-                        .clearAuthentication(true)   // LIMPA as credenciais do Spring Security
-                        .deleteCookies("JSESSIONID") // APAGA o cookie de sessão no navegador do usuário
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
                 );
 
