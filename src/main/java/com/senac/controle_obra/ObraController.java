@@ -23,6 +23,7 @@ public class ObraController {
     @GetMapping
     public String listarFases(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         String usuario = userDetails.getUsername();
+        // Busca APENAS as fases que pertencem ao usuário logado
         List<FaseObra> fases = repository.findByUsuario(usuario);
 
         int totalAtividades = fases.stream().mapToInt(FaseObra::getAtividadesTotais).sum();
@@ -30,6 +31,8 @@ public class ObraController {
         int totalRefazer = fases.stream().mapToInt(FaseObra::getAtividadesRefazer).sum();
 
         double progressoGeral = totalAtividades == 0 ? 0 : ((double) totalExecutadas / totalAtividades) * 100;
+
+        // Pega o nome da obra apenas das fases do PRÓPRIO usuário
         String nomeDaObraAtual = fases.isEmpty() ? "Minha Obra Sem Nome" : fases.get(0).getNomeObra();
 
         model.addAttribute("fases", fases);
@@ -45,38 +48,56 @@ public class ObraController {
     @PostMapping("/adicionar")
     public String adicionarFase(@RequestParam String nome, @RequestParam int totais,
                                 @RequestParam String nomeObra, @AuthenticationPrincipal UserDetails userDetails) {
+        // Vincula a nova etapa e a obra estritamente ao usuário logado
         FaseObra fase = new FaseObra(nome, totais, 0, userDetails.getUsername(), nomeObra);
         repository.save(fase);
         return "redirect:/";
     }
 
     @PostMapping("/atualizar")
-    public String atualizarProgresso(@RequestParam Long id, @RequestParam int executadas) {
+    public String atualizarProgresso(@RequestParam Long id, @RequestParam int executadas, @AuthenticationPrincipal UserDetails userDetails) {
         FaseObra fase = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Id inválido"));
-        fase.setAtividadesExecutadas(executadas);
-        repository.save(fase);
+
+        // Segurança: Só permite atualizar se a fase pertencer ao usuário logado
+        if (fase.getUsuario().equals(userDetails.getUsername())) {
+            fase.setAtividadesExecutadas(executadas);
+            repository.save(fase);
+        }
         return "redirect:/";
     }
 
     @PostMapping("/editar-valores")
-    public String editarValores(@RequestParam Long id, @RequestParam int totais) {
+    public String editarValores(@RequestParam Long id, @RequestParam int totais, @AuthenticationPrincipal UserDetails userDetails) {
         FaseObra fase = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Id inválido"));
-        fase.setAtividadesTotais(totais);
-        repository.save(fase);
+
+        // Segurança: Só permite editar valores se a fase pertencer ao usuário logado
+        if (fase.getUsuario().equals(userDetails.getUsername())) {
+            fase.setAtividadesTotais(totais);
+            repository.save(fase);
+        }
         return "redirect:/";
     }
 
     @PostMapping("/editar-nome")
-    public String editarNome(@RequestParam Long id, @RequestParam String novoNome) {
+    public String editarNome(@RequestParam Long id, @RequestParam String novoNome, @AuthenticationPrincipal UserDetails userDetails) {
         FaseObra fase = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Id inválido"));
-        fase.setNome(novoNome);
-        repository.save(fase);
+
+        // Segurança: Só permite alterar o nome se a fase pertencer ao usuário logado
+        if (fase.getUsuario().equals(userDetails.getUsername())) {
+            fase.setNome(novoNome);
+            repository.save(fase);
+        }
         return "redirect:/";
     }
 
     @PostMapping("/deletar")
-    public String deletarFase(@RequestParam Long id) {
-        repository.deleteById(id);
+    public String deletarFase(@RequestParam Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        FaseObra fase = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Id inválido"));
+
+        // Segurança: Só permite deletar se a fase pertencer ao usuário logado
+        if (fase.getUsuario().equals(userDetails.getUsername())) {
+            repository.deleteById(id);
+        }
         return "redirect:/";
     }
 
@@ -86,12 +107,13 @@ public class ObraController {
         response.setHeader("Content-Disposition", "attachment; filename=relatorio_obra.pdf");
 
         String usuario = userDetails.getUsername();
+        // O PDF também vai puxar estritamente os dados do usuário logado
         List<FaseObra> fases = repository.findByUsuario(usuario);
 
         int totalAtividades = fases.stream().mapToInt(FaseObra::getAtividadesTotais).sum();
         int totalExecutadas = fases.stream().mapToInt(FaseObra::getAtividadesExecutadas).sum();
         double progressoGeral = totalAtividades == 0 ? 0 : ((double) totalExecutadas / totalAtividades) * 100;
-        String nomeDaObraAtual = fases.isEmpty() ? "Minha Obra" : fases.get(0).getNomeObra();
+        String nomeDaObraAtual = fases.isEmpty() ? "Minha Obra Sem Nome" : fases.get(0).getNomeObra();
 
         Document document = new Document(PageSize.A4);
         PdfWriter.getInstance(document, response.getOutputStream());
