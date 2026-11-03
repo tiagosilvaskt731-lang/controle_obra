@@ -186,47 +186,67 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-            //<![CDATA[
-            var totalExecutadas = parseInt(document.getElementById('hdnTotalExecutadas').value) || 0;
-            var totalAtividades = parseInt(document.getElementById('hdnTotalAtividades').value) || 0;
-            var totalRestantes = totalAtividades - totalExecutadas;
-            if (totalRestantes < 0) totalRestantes = 0;
-            var ctxMacro = document.getElementById('graficoRoscaMacro').getContext('2d');
-            new Chart(ctxMacro, {
+            </div> <!-- Fecha a div da tabela -->
+        </div> <!-- Fecha a row principal -->
+    </div> <!-- Fecha o container principal -->
+
+    <!-- Campos ocultos seguros para enviar dados ao JavaScript -->
+    <input type="hidden" id="hdnTotalExecutadas" th:value="${totalExecutadas}">
+    <input type="hidden" id="hdnTotalAtividades" th:value="${totalAtividades}">
+
+    <script>
+        //<![CDATA[
+        // 1. Gráfico de Rosca Macro (Trabalho Feito vs Restante)
+        var totalExecutadas = parseInt(document.getElementById('hdnTotalExecutadas').value) || 0;
+        var totalAtividades = parseInt(document.getElementById('hdnTotalAtividades').value) || 0;
+        var totalRestantes = totalAtividades - totalExecutadas;
+        if (totalRestantes < 0) totalRestantes = 0;
+
+        var ctxMacro = document.getElementById('graficoRoscaMacro').getContext('2d');
+        new Chart(ctxMacro, {
             type: 'doughnut',
             data: {
-            labels: ['Executadas', 'Restantes'],
-            datasets: [{
-            data: [totalExecutadas, totalRestantes],
-            backgroundColor: ['#198754', '#dc3545'],
-            borderWidth: 1
-            }]
+                labels: ['Executadas', 'Restantes'],
+                datasets: [{
+                    data: [totalExecutadas, totalRestantes],
+                    backgroundColor: ['#198754', '#dc3545'],
+                    borderWidth: 1
+                }]
             },
             options: { responsive: true, plugins: { legend: { display: false } } }
-            });
-            var labelsBarras = [];
-            var dadosTotais = [];
-            var dadosExecutadas = [];
-            var linhasTabela = document.querySelectorAll("table tbody tr");
-            linhasTabela.forEach(function(linha) {
+        });
+
+        // 2. Coleta de dados da tabela para o Gráfico de Barras
+        var labelsBarras = [];
+        var dadosTotais = [];
+        var dadosExecutadas = [];
+
+        // Seleciona as linhas de dados geradas pelo Thymeleaf
+        var linhasTabela = document.querySelectorAll("table tbody tr");
+
+        linhasTabela.forEach(function(linha) {
             var colunas = linha.querySelectorAll("td");
             if (colunas.length >= 3) {
-            labelsBarras.push(colunas[0].textContent.trim());
-            dadosTotais.push(parseInt(colunas[1].textContent.trim()) || 0);
-            dadosExecutadas.push(parseInt(colunas[2].textContent.trim()) || 0);
+                labelsBarras.push(colunas[0].textContent.trim());
+                dadosTotais.push(parseInt(colunas[1].textContent.trim()) || 0);
+                dadosExecutadas.push(parseInt(colunas[2].textContent.trim()) || 0);
             }
-            });
-            var ctxObra = document.getElementById('graficoObra').getContext('2d');
-            new Chart(ctxObra, {
+        });
+
+        // Gráfico de Barras por Etapa
+        var ctxObra = document.getElementById('graficoObra').getContext('2d');
+        new Chart(ctxObra, {
             type: 'bar',
             data: {
-            labels: labelsBarras,
-            datasets: [
-            { label: 'Meta Total', data: dadosTotais, backgroundColor: '#0dcaf0' },
-            { label: 'Realizado', data: dadosExecutadas, backgroundColor: '#198754' }
-            ]
+                labels: labelsBarras,
+                datasets: [
+                    { label: 'Meta Total', data: dadosTotais, backgroundColor: '#0dcaf0' },
+                    { label: 'Realizado', data: dadosExecutadas, backgroundColor: '#198754' }
+                ]
             },
             options: { scales: { y: { beginAtZero: true } } }
-            });
-            //]]>
+        });
+        //]]>
+    </script>
+</body>
+</html>
