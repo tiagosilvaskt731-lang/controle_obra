@@ -12,7 +12,7 @@ public class FaseObra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nomeObra; // Campo para o Nome do Empreendimento
+    private String nomeObra;
     private String nome;
     private int atividadesTotais;
     private int atividadesExecutadas;

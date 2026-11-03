@@ -10,7 +10,7 @@
 <div class="container bg-white p-4 rounded shadow-sm">
     <!-- Barra Superior com botão de Logout -->
     <div class="d-flex justify-content-between align-items-center mb-2">
-        <h1>静态🏗️ Painel: <span class="text-primary" th:text="${nomeObra}">Nome da Obra</span></h1>
+        <h1>🏗️ Painel: <span class="text-primary" th:text="${nomeObra}">Nome da Obra</span></h1>
         <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn btn-outline-danger btn-sm">🔒 Sair do Sistema</button>
         </form>
@@ -198,8 +198,8 @@
     var dadosExecutadas = [];
 
     listaFases.forEach(function(fase) {
+
         labelsBarras.push(fase.nome);
-        Use o código com cuidado.
         dadosTotais.push(fase.atividadesTotais);
         dadosExecutadas.push(fase.atividadesExecutadas);
     });
