@@ -42,17 +42,17 @@ public class SecurityConfig {
                 .roles("USER")
                 .build();
 
-        UserDetails engenheiro = User.withDefaultPasswordEncoder()
+        UserDetails lucas = User.withDefaultPasswordEncoder()
                 .username("lucas")
                 .password("9876")
                 .roles("USER")
                 .build();
-        UserDetails Jesiel = User.withDefaultPasswordEncoder()
+        UserDetails jesiel = User.withDefaultPasswordEncoder()
                 .username("jesiel")
                 .password("4321")
                 .roles("USER")
                 .build();
 
-        return new InMemoryUserDetailsManager(admin, tiago, engenheiro);
+        return new InMemoryUserDetailsManager(admin, tiago, lucas, jesiel);
     }
 }
