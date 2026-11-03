@@ -38,18 +38,18 @@ public class SecurityConfig {
 
         UserDetails tiago = User.withDefaultPasswordEncoder()
                 .username("tiago")
-                .password("1312")
+                .password("1213")
                 .roles("USER")
                 .build();
 
         UserDetails lucas = User.withDefaultPasswordEncoder()
                 .username("lucas")
-                .password("9876")
+                .password("2405")
                 .roles("USER")
                 .build();
         UserDetails jesiel = User.withDefaultPasswordEncoder()
                 .username("jesiel")
-                .password("4321")
+                .password("1512")
                 .roles("USER")
                 .build();
 
