@@ -12,6 +12,7 @@ public class FaseObra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String nomeObra; // Campo para o Nome do Empreendimento
     private String nome;
     private int atividadesTotais;
     private int atividadesExecutadas;
@@ -20,12 +21,13 @@ public class FaseObra {
 
     public FaseObra() {}
 
-    public FaseObra(String nome, int atividadesTotais, int atividadesExecutadas, String usuario) {
+    public FaseObra(String nome, int atividadesTotais, int atividadesExecutadas, String usuario, String nomeObra) {
         this.nome = nome;
         this.atividadesTotais = atividadesTotais;
         this.atividadesExecutadas = atividadesExecutadas;
         this.atividadesRefazer = 0;
         this.usuario = usuario;
+        this.nomeObra = nomeObra;
     }
 
     public int getRestante() {
@@ -40,6 +42,9 @@ public class FaseObra {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public String getNomeObra() { return nomeObra; }
+    public void setNomeObra(String nomeObra) { this.nomeObra = nomeObra; }
 
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }

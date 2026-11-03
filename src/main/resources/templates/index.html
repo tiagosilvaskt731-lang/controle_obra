@@ -10,12 +10,19 @@
 <div class="container bg-white p-4 rounded shadow-sm">
     <!-- Barra Superior com botão de Logout -->
     <div class="d-flex justify-content-between align-items-center mb-2">
-        <h1>🏗️ Painel de Controle e Evolução da Obra</h1>
+        <h1>静态🏗️ Painel: <span class="text-primary" th:text="${nomeObra}">Nome da Obra</span></h1>
         <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn btn-outline-danger btn-sm">🔒 Sair do Sistema</button>
         </form>
     </div>
     <p class="text-muted">Gerencie metas, altere números planejados e acompanhe o progresso geral.</p>
+
+    <!-- Botão Exportar PDF -->
+    <div class="d-flex justify-content-end mb-3">
+        <a th:href="@{/pdf}" class="btn btn-primary btn-sm fw-bold shadow-sm">
+            📄 Exportar Relatório Atual em PDF
+        </a>
+    </div>
     <hr>
 
     <!-- Indicadores Macro (Topo) -->
@@ -104,6 +111,9 @@
                 <h5 class="mb-2 text-primary">➕ Adicionar Nova Etapa</h5>
                 <form action="/adicionar" method="post">
                     <div class="mb-2">
+                        <input type="text" name="nomeObra" class="form-control form-control-sm" placeholder="Nome da Obra/Empreendimento" required>
+                    </div>
+                    <div class="mb-2">
                         <input type="text" name="nome" class="form-control form-control-sm" placeholder="Nome da nova etapa" required>
                     </div>
                     <div class="mb-2">
@@ -189,14 +199,15 @@
 
     listaFases.forEach(function(fase) {
         labelsBarras.push(fase.nome);
+        Use o código com cuidado.
         dadosTotais.push(fase.atividadesTotais);
         dadosExecutadas.push(fase.atividadesExecutadas);
     });
-
     var ctxObra = document.getElementById('graficoObra').getContext('2d');
     new Chart(ctxObra, {
         type: 'bar',
         data: {
+            labels: labelsBarras,
             datasets: [
                 { label: 'Meta Total', data: dadosTotais, backgroundColor: '#0dcaf0' },
                 { label: 'Realizado', data: dadosExecutadas, backgroundColor: '#198754' }
@@ -204,6 +215,3 @@
         },
         options: { scales: { y: { beginAtZero: true } } }
     });
-</script>
-</body>
-</html>
