@@ -10,8 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -19,20 +17,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-                .formLogin(withDefaults())
-                .httpBasic(withDefaults());
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .defaultSuccessUrl("/", true) // Força ir para a rota limpa inicial após o login
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true) // DESTRÓI a sessão antiga na memória do servidor
+                        .clearAuthentication(true)   // LIMPA as credenciais do Spring Security
+                        .deleteCookies("JSESSIONID") // APAGA o cookie de sessão no navegador do usuário
+                        .permitAll()
+                );
 
         return http.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        // Criando múltiplos usuários com senhas e acessos isolados
         UserDetails admin = User.withDefaultPasswordEncoder()
                 .username("admin")
-                .password("12072023")
+                .password("1234")
                 .roles("USER")
                 .build();
 
@@ -43,10 +51,11 @@ public class SecurityConfig {
                 .build();
 
         UserDetails lucas = User.withDefaultPasswordEncoder()
-                .username("lucas")
+                .username("Lucas")
                 .password("2405")
                 .roles("USER")
                 .build();
+
         UserDetails jesiel = User.withDefaultPasswordEncoder()
                 .username("jesiel")
                 .password("1512")
