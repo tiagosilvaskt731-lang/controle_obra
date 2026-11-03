@@ -6,6 +6,6 @@ import java.util.List;
 
 @Repository
 public interface FaseObraRepository extends JpaRepository<FaseObra, Long> {
-    // NOVO: Método mágico que filtra no MySQL apenas pelo nome do usuário logado
+    // Este método é crucial: ele garante a filtragem por usuário no banco de dados
     List<FaseObra> findByUsuario(String usuario);
 }
