@@ -17,7 +17,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // DESATIVA A VALIDAÇÃO DO CSRF PARA LIBERAR OS FORMULÁRIOS POST
+
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated()
@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
+
                 );
 
         return http.build();
@@ -63,7 +64,12 @@ public class SecurityConfig {
                 .password("1512")
                 .roles("USER")
                 .build();
+        UserDetails cristiano   = User.withDefaultPasswordEncoder()
+                .username("cristiano")
+                .password("2505")
+                .roles("USER")
+                .build();
 
-        return new InMemoryUserDetailsManager(admin, tiago, lucas, jesiel);
+        return new InMemoryUserDetailsManager(admin, tiago, lucas, jesiel, cristiano);
     }
 }

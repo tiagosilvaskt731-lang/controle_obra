@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ControleObraApplication {
+public class SControleObraApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ControleObraApplication.class, args);
